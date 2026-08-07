@@ -28,6 +28,16 @@
 
   <!-- parameters -->
   <xacro:arg name="arm_prefix" default="" />
+  <!--
+    Whether `robot_sn` contributes to joint and link names. True keeps the
+    historical `<robot_sn>_joint1` naming; false names joints from `arm_prefix`
+    alone and leaves `robot_sn` to address the arm over the RDK. See
+    `compute_arm_prefix` in `urdf/common/flexiv_common.xacro`.
+
+    Wired into the single-arm branch only. The dual-arm, paired, and AICO branches
+    disambiguate with explicit `left`/`right` prefixes and are unaffected.
+  -->
+  <xacro:arg name="use_sn_prefix" default="true" />
   <xacro:arg name="robot_sn" default="" />
   <xacro:arg name="joint_limits_parameters_file"
     default="$(find flexiv_description)/config/$(arg robot_type)/joint_limits.yaml" />
@@ -101,6 +111,7 @@
       inertia_parameters_file="$(arg inertia_parameters_file)"
       visual_parameters_file="$(arg visual_parameters_file)"
       arm_prefix="$(arg arm_prefix)"
+      use_sn_prefix="$(arg use_sn_prefix)"
       load_gripper="$(arg load_gripper)"
       gripper_name="$(arg gripper_name)"
       load_mounted_ft_sensor="$(arg load_mounted_ft_sensor)"
