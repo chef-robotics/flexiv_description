@@ -7,12 +7,32 @@
 
     This is the single source of truth for the prefix.
 
-    arm_prefix: 'left', 'right' or '' (user-supplied prefixes also allowed)
-    robot_sn:   robot serial number, may be empty
+    arm_prefix:    'left', 'right' or '' (user-supplied prefixes also allowed)
+    robot_sn:      robot serial number, may be empty
+    use_sn_prefix: whether `robot_sn` contributes to joint and link names
+
+    `use_sn_prefix` defaults to true, which is the historical behaviour:
+    `<arm_prefix>_<robot_sn>_`, or `<robot_sn>_` when `arm_prefix` is empty.
+
+    Set it false to name joints and links from `arm_prefix` alone, leaving
+    `robot_sn` to do only what it must — address the arm over the RDK. The two are
+    otherwise independent (`flexiv.ros2_control.xacro` already takes `robot_sn` and
+    `prefix` as separate hardware params), but coupling them in the name forces
+    every consumer to know the serial: the joint list in
+    `flexiv_controllers.yaml`, MoveIt's joint limits, and every joint name in a
+    downstream stack, which turns otherwise arm-generic config into per-arm
+    config. `robot_sn` also cannot simply be emptied to avoid this — `ros2 launch`
+    rejects an empty value, and the hardware interface needs a real serial.
+
+    Either way the result has no leading or doubled underscore: each present
+    component contributes exactly one trailing separator, and an all-empty result
+    is the empty string rather than '_' (see the `torso_base_link` note in
+    `mico_core.xacro`, which depends on this).
   -->
-  <xacro:macro name="compute_arm_prefix" params="arm_prefix:='' robot_sn:=''">
+  <xacro:macro name="compute_arm_prefix" params="arm_prefix:='' robot_sn:='' use_sn_prefix:=true">
+    <xacro:property name="sn_part" value="${robot_sn if use_sn_prefix else ''}" lazy_eval="false" />
     <xacro:property name="computed_arm_prefix"
-      value="${(arm_prefix + '_' + robot_sn + '_') if arm_prefix != '' and robot_sn != '' else (arm_prefix + robot_sn + '_') if (arm_prefix + robot_sn) != '' else ''}"
+      value="${''.join([part + '_' for part in [arm_prefix, sn_part] if part != ''])}"
       scope="parent" />
   </xacro:macro>
 

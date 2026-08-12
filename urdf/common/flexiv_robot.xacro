@@ -10,6 +10,7 @@
     inertia_parameters_file
     visual_parameters_file
     arm_prefix:=''
+    use_sn_prefix:=true
     load_gripper:=false
     gripper_name:='Flexiv-GN01'
     load_mounted_ft_sensor:=false
@@ -20,7 +21,8 @@
     ">
 
     <xacro:include filename="$(find flexiv_description)/urdf/common/flexiv_common.xacro" />
-    <xacro:compute_arm_prefix arm_prefix="${arm_prefix}" robot_sn="${robot_sn}" />
+    <xacro:compute_arm_prefix arm_prefix="${arm_prefix}" robot_sn="${robot_sn}"
+      use_sn_prefix="${use_sn_prefix}" />
     <xacro:property name="prefix" value="${computed_arm_prefix}" />
 
     <xacro:if value="${load_mounted_ft_sensor and robot_type not in ['Rizon4', 'Rizon4R', 'Rizon10', 'Rizon10R']}">
