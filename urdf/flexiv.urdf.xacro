@@ -139,6 +139,14 @@
       value="${'$(arg kinematics_parameters_file)' if '$(arg kinematics_parameters_file)' != ''
                else cfg + '/Enlight-LL/default_kinematics.yaml'}" />
 
+    <!--
+      `use_sn_prefix` is hardcoded off (not threaded from a top-level arg,
+      unlike the single-arm branch above): the two arms share one `robot_sn`,
+      so `left`/`right` alone already disambiguate their joints and states,
+      and folding the serial number in would only make names longer without
+      adding information.
+    -->
+
     <!-- Left arm: owns the shared world link + its base joint. -->
     <xacro:flexiv_robot
       robot_type="Enlight-L"
@@ -149,6 +157,7 @@
       inertia_parameters_file="${arm_cfg}/inertia_parameters.yaml"
       visual_parameters_file="${arm_cfg}/visual_parameters.yaml"
       arm_prefix="left"
+      use_sn_prefix="false"
       load_gripper="$(arg load_gripper)"
       gripper_name="$(arg gripper_name)"
       load_mounted_ft_sensor="$(arg load_mounted_ft_sensor)"
@@ -168,6 +177,7 @@
       inertia_parameters_file="${arm_cfg}/inertia_parameters.yaml"
       visual_parameters_file="${arm_cfg}/visual_parameters.yaml"
       arm_prefix="right"
+      use_sn_prefix="false"
       load_gripper="$(arg load_gripper)"
       gripper_name="$(arg gripper_name)"
       load_mounted_ft_sensor="$(arg load_mounted_ft_sensor)"
@@ -177,9 +187,9 @@
       base_rpy="${radians(right_pose['rx'])} ${radians(right_pose['ry'])} ${radians(right_pose['rz'])}">
     </xacro:flexiv_robot>
 
-    <xacro:compute_arm_prefix arm_prefix="left" robot_sn="$(arg robot_sn)" />
+    <xacro:compute_arm_prefix arm_prefix="left" robot_sn="$(arg robot_sn)" use_sn_prefix="false" />
     <xacro:property name="ll_prefix_left" value="${computed_arm_prefix}" lazy_eval="false" />
-    <xacro:compute_arm_prefix arm_prefix="right" robot_sn="$(arg robot_sn)" />
+    <xacro:compute_arm_prefix arm_prefix="right" robot_sn="$(arg robot_sn)" use_sn_prefix="false" />
     <xacro:property name="ll_prefix_right" value="${computed_arm_prefix}" lazy_eval="false" />
 
   </xacro:if>
