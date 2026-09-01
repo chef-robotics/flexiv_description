@@ -148,7 +148,8 @@
       kinematics_section="ARM_1"
       inertia_parameters_file="${arm_cfg}/inertia_parameters.yaml"
       visual_parameters_file="${arm_cfg}/visual_parameters.yaml"
-      arm_prefix="left"
+      arm_prefix="arm1"
+      use_sn_prefix="$(arg use_sn_prefix)"
       load_gripper="$(arg load_gripper)"
       gripper_name="$(arg gripper_name)"
       load_mounted_ft_sensor="$(arg load_mounted_ft_sensor)"
@@ -167,7 +168,8 @@
       kinematics_section="ARM_2"
       inertia_parameters_file="${arm_cfg}/inertia_parameters.yaml"
       visual_parameters_file="${arm_cfg}/visual_parameters.yaml"
-      arm_prefix="right"
+      arm_prefix="arm2"
+      use_sn_prefix="$(arg use_sn_prefix)"
       load_gripper="$(arg load_gripper)"
       gripper_name="$(arg gripper_name)"
       load_mounted_ft_sensor="$(arg load_mounted_ft_sensor)"
@@ -177,9 +179,9 @@
       base_rpy="${radians(right_pose['rx'])} ${radians(right_pose['ry'])} ${radians(right_pose['rz'])}">
     </xacro:flexiv_robot>
 
-    <xacro:compute_arm_prefix arm_prefix="left" robot_sn="$(arg robot_sn)" />
+    <xacro:compute_arm_prefix arm_prefix="arm1" robot_sn="$(arg robot_sn)" use_sn_prefix="$(arg use_sn_prefix)" />
     <xacro:property name="ll_prefix_left" value="${computed_arm_prefix}" lazy_eval="false" />
-    <xacro:compute_arm_prefix arm_prefix="right" robot_sn="$(arg robot_sn)" />
+    <xacro:compute_arm_prefix arm_prefix="arm2" robot_sn="$(arg robot_sn)" use_sn_prefix="$(arg use_sn_prefix)" />
     <xacro:property name="ll_prefix_right" value="${computed_arm_prefix}" lazy_eval="false" />
 
   </xacro:if>
