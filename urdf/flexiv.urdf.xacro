@@ -16,6 +16,14 @@
 
   <!-- parameters -->
   <xacro:arg name="arm_prefix" default="" />
+  <!--
+    Whether `robot_sn` becomes part of link/joint names. Upstream default is
+    `true` (`arm1_<serial>_joint1`); `false` gives bare `arm1_joint1`, which is
+    what a consumer wants when its own config, SRDF and limits name joints
+    without a per-robot serial in them. `robot_sn` still reaches the RDK either
+    way, since that is how the robot is addressed.
+  -->
+  <xacro:arg name="use_sn_prefix" default="true" />
   <xacro:arg name="robot_sn" default="" />
   <xacro:arg name="joint_limits_parameters_file"
     default="$(find flexiv_description)/config/$(arg robot_type)/joint_limits.yaml" />
@@ -64,6 +72,7 @@
       inertia_parameters_file="$(arg inertia_parameters_file)"
       visual_parameters_file="$(arg visual_parameters_file)"
       arm_prefix="$(arg arm_prefix)"
+      use_sn_prefix="$(arg use_sn_prefix)"
       load_gripper="$(arg load_gripper)"
       gripper_name="$(arg gripper_name)"
       load_mounted_ft_sensor="$(arg load_mounted_ft_sensor)"
@@ -87,6 +96,21 @@
     <!-- Each arm of a dual-arm product is an Enlight-L: reuse its config + meshes for both arms. -->
     <xacro:property name="arm_cfg" value="$(find flexiv_description)/config/Enlight-L" />
     <xacro:property name="arm_init_positions" value="${arm_cfg}/initial_positions.yaml" />
+    <!--
+      Per-arm initial positions, overridable independently.
+
+      Upstream feeds both arms the same file, so a consumer that models only one
+      arm cannot seed a real start pose for it without also moving the other.
+      `initial_positions_file` (the single-arm arg) applies to arm 1, and
+      `initial_positions_file_arm2` to arm 2; each falls back to the vendor
+      default. Only mock hardware reads these (a real arm reports its own
+      joints), so this decides where a simulated arm boots.
+    -->
+    <xacro:arg name="initial_positions_file_arm2" default="" />
+    <xacro:property name="arm1_init_positions"
+      value="${'$(arg initial_positions_file)' if '$(arg initial_positions_file)' != '' else arm_init_positions}" lazy_eval="false" />
+    <xacro:property name="arm2_init_positions"
+      value="${'$(arg initial_positions_file_arm2)' if '$(arg initial_positions_file_arm2)' != '' else arm_init_positions}" lazy_eval="false" />
 
     <!-- Left arm: owns the shared world link + its base joint. ros2_control handled below. -->
     <xacro:enlight_robot
@@ -96,14 +120,15 @@
       kinematics_parameters_file="${arm_cfg}/default_kinematics.yaml"
       inertia_parameters_file="${arm_cfg}/inertia_parameters.yaml"
       visual_parameters_file="${arm_cfg}/visual_parameters.yaml"
-      arm_prefix="left"
+      arm_prefix="arm1"
+      use_sn_prefix="$(arg use_sn_prefix)"
       load_gripper="$(arg load_gripper)"
       gripper_name="$(arg gripper_name)"
       load_mounted_ft_sensor="$(arg load_mounted_ft_sensor)"
       ros2_control="false"
       use_fake_hardware="$(arg use_fake_hardware)"
       fake_sensor_commands="$(arg fake_sensor_commands)"
-      initial_positions_file="${arm_init_positions}"
+      initial_positions_file="${arm1_init_positions}"
       add_world_link="true"
       create_base_joint="true"
       base_xyz="${left_pose['x']} ${left_pose['y']} ${left_pose['z']}"
@@ -118,31 +143,46 @@
       kinematics_parameters_file="${arm_cfg}/default_kinematics.yaml"
       inertia_parameters_file="${arm_cfg}/inertia_parameters.yaml"
       visual_parameters_file="${arm_cfg}/visual_parameters.yaml"
-      arm_prefix="right"
+      arm_prefix="arm2"
+      use_sn_prefix="$(arg use_sn_prefix)"
       load_gripper="$(arg load_gripper)"
       gripper_name="$(arg gripper_name)"
       load_mounted_ft_sensor="$(arg load_mounted_ft_sensor)"
       ros2_control="false"
       use_fake_hardware="$(arg use_fake_hardware)"
       fake_sensor_commands="$(arg fake_sensor_commands)"
-      initial_positions_file="${arm_init_positions}"
+      initial_positions_file="${arm2_init_positions}"
       add_world_link="false"
       create_base_joint="true"
       base_xyz="${right_pose['x']} ${right_pose['y']} ${right_pose['z']}"
       base_rpy="${radians(right_pose['rx'])} ${radians(right_pose['ry'])} ${radians(right_pose['rz'])}">
     </xacro:enlight_robot>
 
-    <!-- Single unified ros2_control for both arms (one robot_sn, prefix_left/prefix_right). -->
+    <!--
+      Single unified ros2_control for both arms (one robot_sn,
+      prefix_left/prefix_right).
+
+      The prefixes are derived the same way `enlight_robot` builds its own, and
+      MUST match it: these become the `<joint name=...>` entries inside
+      `<ros2_control>`, and a name that does not exist in the link/joint tree
+      leaves the controller unable to claim its interfaces. The failure is
+      silent, showing up only as a controller that never reaches `active`.
+      Hardcoding them (as `left_$(arg robot_sn)_`) desyncs the moment
+      `arm_prefix` or `use_sn_prefix` changes.
+    -->
     <xacro:if value="$(arg ros2_control)">
+      <xacro:property name="ll_sn_part" value="${'$(arg robot_sn)' if '$(arg use_sn_prefix)' == 'true' else ''}" lazy_eval="false" />
+      <xacro:property name="ll_prefix_arm1" value="${''.join([part + '_' for part in ['arm1', ll_sn_part] if part != ''])}" />
+      <xacro:property name="ll_prefix_arm2" value="${''.join([part + '_' for part in ['arm2', ll_sn_part] if part != ''])}" />
       <xacro:flexiv_dual_ros2_control
-        prefix_left="left_$(arg robot_sn)_"
-        prefix_right="right_$(arg robot_sn)_"
+        prefix_left="${ll_prefix_arm1}"
+        prefix_right="${ll_prefix_arm2}"
         robot_sn="$(arg robot_sn)"
         rdk_control_mode="$(arg rdk_control_mode)"
         use_fake_hardware="$(arg use_fake_hardware)"
         fake_sensor_commands="$(arg fake_sensor_commands)"
-        initial_positions_file_left="${arm_init_positions}"
-        initial_positions_file_right="${arm_init_positions}" />
+        initial_positions_file_left="${arm1_init_positions}"
+        initial_positions_file_right="${arm2_init_positions}" />
     </xacro:if>
   </xacro:if>
 
