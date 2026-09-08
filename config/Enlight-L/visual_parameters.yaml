@@ -1,3 +1,35 @@
+# CHEF FORK: four collision meshes are rotated 180 degrees about Z relative to
+# their visual counterparts, and are corrected here with a `yaw` origin rather
+# than by editing the meshes.
+#
+# Measured from the mesh files themselves, comparing the visual .obj and
+# collision .stl bounding boxes of every link. The centres disagree as-is and
+# agree after rotating the collision mesh 180 deg about Z:
+#
+#   link       centre error as-is    after rot 180 Z
+#   link1      (0, 0.0324, 0.0133)   (0, 0.0018, 0.0133)
+#   link3      (0, 0.0320, 0.0132)   (0, 0.0022, 0.0132)
+#   link4      (0, 0.1144, 0.0018)   (0, 0.0084, 0.0018)
+#   link5      (0, 0.0273, 0.0101)   (0, 0.0017, 0.0101)
+#
+# link2, link6 and link7 are correct as-is and are left alone -- rotating them
+# makes them worse, which is the check that this is a real per-mesh authoring
+# error rather than a frame convention that should be applied uniformly.
+#
+# link4 is the one that shows up in RViz: at 0.114 m its collision hull sits
+# visibly off the arm, and MoveIt plans against that phantom volume. The others
+# are ~0.03 m and easy to miss.
+#
+# Residual after the fix is a few mm, which is expected: the collision hull is
+# an inflated convex approximation of the visual, not the same surface.
+#
+# Fixed in the config rather than the meshes so the vendor's own binaries stay
+# untouched and a version bump does not silently drop the correction.
+#
+# `yaw` is the literal, not `${pi}`: `get_collisions` in
+# `urdf/common/flexiv_common.xacro` interpolates this value inside its own
+# `${...}` for the `rpy` attribute, so a xacro expression here would nest and
+# fail to parse.
 visual_parameters:
   base_link:
     visual:
@@ -26,6 +58,15 @@ visual_parameters:
           package: flexiv_description
           path: meshes/Enlight-L/visual/link1.obj
     collision:
+      # Collision mesh is authored 180 deg about Z from the visual;
+      # see the file header. Yaw brings it back into agreement.
+      origin:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        roll: 0.0
+        pitch: 0.0
+        yaw: 3.141592653589793
       mesh:
         package: flexiv_description
         path: meshes/Enlight-L/collision/link1.stl
@@ -46,6 +87,15 @@ visual_parameters:
           package: flexiv_description
           path: meshes/Enlight-L/visual/link3.obj
     collision:
+      # Collision mesh is authored 180 deg about Z from the visual;
+      # see the file header. Yaw brings it back into agreement.
+      origin:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        roll: 0.0
+        pitch: 0.0
+        yaw: 3.141592653589793
       mesh:
         package: flexiv_description
         path: meshes/Enlight-L/collision/link3.stl
@@ -56,6 +106,15 @@ visual_parameters:
           package: flexiv_description
           path: meshes/Enlight-L/visual/link4.obj
     collision:
+      # Collision mesh is authored 180 deg about Z from the visual;
+      # see the file header. Yaw brings it back into agreement.
+      origin:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        roll: 0.0
+        pitch: 0.0
+        yaw: 3.141592653589793
       mesh:
         package: flexiv_description
         path: meshes/Enlight-L/collision/link4.stl
@@ -66,6 +125,15 @@ visual_parameters:
           package: flexiv_description
           path: meshes/Enlight-L/visual/link5.obj
     collision:
+      # Collision mesh is authored 180 deg about Z from the visual;
+      # see the file header. Yaw brings it back into agreement.
+      origin:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        roll: 0.0
+        pitch: 0.0
+        yaw: 3.141592653589793
       mesh:
         package: flexiv_description
         path: meshes/Enlight-L/collision/link5.stl
