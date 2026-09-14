@@ -159,8 +159,8 @@
     </xacro:enlight_robot>
 
     <!--
-      Single unified ros2_control for both arms (one robot_sn,
-      prefix_left/prefix_right).
+      Single unified ros2_control for both arms (one robot_sn, two arm
+      prefixes).
 
       The prefixes are derived the same way `enlight_robot` builds its own, and
       MUST match it: these become the `<joint name=...>` entries inside
@@ -169,20 +169,64 @@
       silent, showing up only as a controller that never reaches `active`.
       Hardcoding them (as `left_$(arg robot_sn)_`) desyncs the moment
       `arm_prefix` or `use_sn_prefix` changes.
+
+      THE MACRO'S `_left`/`_right` ARGUMENTS DO NOT NAME SIDES. The hardware
+      interface binds them POSITIONALLY: it builds
+      `arm_prefixes = [prefix_left, prefix_right]` and maps that list onto the
+      RDK's `[ARM_1, ARM_2]`, joining the two by index
+      (`flexiv_hardware_interface.cpp`, the `prefix_left`/`prefix_right` branch
+      and `determine_active_groups`). Nothing anywhere looks a prefix up
+      against a joint group by name.
+
+      So the argument named `prefix_left` means "the prefix for whichever arm
+      the robot calls ARM_1", nothing more. The RDK's own header documents
+      `ARM_1` as "the 1st single arm" and `ARM_2` as "the 2nd": ordinal, with no
+      side implied. `ARM_1`/`ARM_2` are fixed RDK enum values
+      (`flexiv/rdk/data.hpp`) and cannot be renamed or reordered.
+
+      WHICH PHYSICAL ARM IS `ARM_1` IS SET IN FLEXIV ELEMENTS, not here and not
+      in any of this repo's code. Nothing in this stack can ask the robot which
+      arm is on which side, and nothing validates the vendor's left/right
+      assumption. If the arms ever come up swapped, that installation setting is
+      what to check first; do not "fix" it by crossing the bindings below, which
+      silently contradicts the geometry above (arm 1 is placed at `left_pose`).
+
+      The local `prefix_arm_1`/`prefix_arm_2` aliases exist so this call site
+      reads in the RDK's own terms. They are a rename at the call site only.
+
+      TODO: rename the parameters themselves to `prefix_arm_1`/`prefix_arm_2`
+      (and `initial_positions_file_arm_1`/`_arm_2`). Held off deliberately to
+      keep this fork's diff against upstream small, because the names are NOT
+      Enlight-LL-specific and a real rename is not local:
+        - `flexiv_dual_ros2_control` (`common/flexiv_dual.ros2_control.xacro`)
+          is shared with MICO-Core (`common/mico_core.xacro`).
+        - `FlexivHardwareInterface` reads `prefix_left`/`prefix_right` by string
+          name, so it serves MICO-Plus and MICO-Ultra through
+          `common/flexiv_mico.ros2_control.xacro` as well.
+      A rename therefore has to move the macro params, the C++ lookups and
+      error strings, and all four MICO call sites together (~28 sites across 8
+      files), or the un-renamed callers die with the "expected both prefix_left
+      and prefix_right" fatal. That spans hardware we have none of and cannot
+      test. Do it upstream, or behind a C++ shim that accepts both spellings.
     -->
     <xacro:if value="$(arg ros2_control)">
       <xacro:property name="ll_sn_part" value="${'$(arg robot_sn)' if '$(arg use_sn_prefix)' == 'true' else ''}" lazy_eval="false" />
       <xacro:property name="ll_prefix_arm1" value="${''.join([part + '_' for part in ['arm1', ll_sn_part] if part != ''])}" />
       <xacro:property name="ll_prefix_arm2" value="${''.join([part + '_' for part in ['arm2', ll_sn_part] if part != ''])}" />
+      <!-- Aliases in the RDK's terms: slot 0 is ARM_1, slot 1 is ARM_2. -->
+      <xacro:property name="prefix_arm_1" value="${ll_prefix_arm1}" />
+      <xacro:property name="prefix_arm_2" value="${ll_prefix_arm2}" />
+      <xacro:property name="initial_positions_file_arm_1" value="${arm1_init_positions}" />
+      <xacro:property name="initial_positions_file_arm_2" value="${arm2_init_positions}" />
       <xacro:flexiv_dual_ros2_control
-        prefix_left="${ll_prefix_arm1}"
-        prefix_right="${ll_prefix_arm2}"
+        prefix_left="${prefix_arm_1}"
+        prefix_right="${prefix_arm_2}"
         robot_sn="$(arg robot_sn)"
         rdk_control_mode="$(arg rdk_control_mode)"
         use_fake_hardware="$(arg use_fake_hardware)"
         fake_sensor_commands="$(arg fake_sensor_commands)"
-        initial_positions_file_left="${arm1_init_positions}"
-        initial_positions_file_right="${arm2_init_positions}" />
+        initial_positions_file_left="${initial_positions_file_arm_1}"
+        initial_positions_file_right="${initial_positions_file_arm_2}" />
     </xacro:if>
   </xacro:if>
 
