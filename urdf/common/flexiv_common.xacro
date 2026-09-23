@@ -67,8 +67,14 @@
     Extract joint limits parameters from the config file
     name: name of the joint
   -->
-  <xacro:macro name="get_joint_limits" params="name">
-    <xacro:property name="limits" value="${sec_joint_limits[name]}" lazy_eval="false" />
+  <xacro:macro name="get_joint_limits" params="name prefix:=''">
+    <!-- Prefer the prefixed key so one file can hold every arm of a multi-arm
+      robot, and so those keys can match the joint names the URDF emits. Falls
+      back to the bare key, which is how the configs in `config/` are written. -->
+    <xacro:property name="limits_key"
+      value="${prefix + name if (prefix + name) in sec_joint_limits else name}"
+      lazy_eval="false" />
+    <xacro:property name="limits" value="${sec_joint_limits[limits_key]}" lazy_eval="false" />
     <limit lower="${limits['lower']}" upper="${limits['upper']}" effort="${limits['effort']}"
       velocity="${limits['velocity']}" />
     <safety_controller k_position="100.0" k_velocity="40.0"
