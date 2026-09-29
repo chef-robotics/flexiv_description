@@ -17,6 +17,7 @@
     rdk_control_mode:='joint_position'
     use_fake_hardware:=false
     fake_sensor_commands:=false
+    friction_comp_scale:=100
     initial_positions_file_left
     initial_positions_file_right
     ">
@@ -39,6 +40,7 @@
           <param name="prefix_left">${prefix_left}</param>
           <param name="prefix_right">${prefix_right}</param>
           <param name="rdk_control_mode">${rdk_control_mode}</param>
+          <param name="friction_comp_scale">${friction_comp_scale}</param>
         </xacro:unless>
       </hardware>
 

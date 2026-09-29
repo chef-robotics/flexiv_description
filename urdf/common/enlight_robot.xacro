@@ -18,6 +18,7 @@
     rdk_control_mode:='joint_position'
     use_fake_hardware:=false
     fake_sensor_commands:=false
+    friction_comp_scale:=100
     add_world_link:=true
     create_base_joint:=true
     initial_positions_file:='$(find flexiv_description)/config/Enlight-L/initial_positions.yaml'
@@ -65,6 +66,7 @@
         rdk_control_mode="${rdk_control_mode}"
         use_fake_hardware="${use_fake_hardware}"
         fake_sensor_commands="${fake_sensor_commands}"
+        friction_comp_scale="${friction_comp_scale}"
         initial_positions_file="${initial_positions_file}"
       />
     </xacro:if>

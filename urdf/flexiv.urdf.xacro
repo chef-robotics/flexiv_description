@@ -41,6 +41,11 @@
   <xacro:arg name="rdk_control_mode" default="joint_position" />
   <xacro:arg name="use_fake_hardware" default="false" />
   <xacro:arg name="fake_sensor_commands" default="false" />
+  <!--
+    RDK friction compensation during joint torque streaming, in percent [0, 100],
+    applied to every joint group. 100 is the RDK default; mock hardware ignores it.
+  -->
+  <xacro:arg name="friction_comp_scale" default="100" />
   <xacro:arg name="initial_positions_file" default="" />
   <xacro:arg name="mounting_file" default="$(find flexiv_description)/config/single_robot_mounting.yaml" />
   <xacro:arg name="dual_mounting_file" default="$(find flexiv_description)/config/dual_robot_mounting.yaml" />
@@ -80,6 +85,7 @@
       rdk_control_mode="$(arg rdk_control_mode)"
       use_fake_hardware="$(arg use_fake_hardware)"
       fake_sensor_commands="$(arg fake_sensor_commands)"
+      friction_comp_scale="$(arg friction_comp_scale)"
       initial_positions_file="${resolved_initial_positions_file}"
       base_rpy="${radians(mounting['orientation']['rx'])} ${radians(mounting['orientation']['ry'])} ${radians(mounting['orientation']['rz'])}">
     </xacro:enlight_robot>
@@ -225,6 +231,7 @@
         rdk_control_mode="$(arg rdk_control_mode)"
         use_fake_hardware="$(arg use_fake_hardware)"
         fake_sensor_commands="$(arg fake_sensor_commands)"
+        friction_comp_scale="$(arg friction_comp_scale)"
         initial_positions_file_left="${initial_positions_file_arm_1}"
         initial_positions_file_right="${initial_positions_file_arm_2}" />
     </xacro:if>
