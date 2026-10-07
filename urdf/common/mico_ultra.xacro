@@ -20,6 +20,7 @@
     load_mounted_ft_sensor:=false
     ros2_control:=false
     rdk_control_mode:='joint_position'
+    feedforward_time_constant:='0.02'
     use_fake_hardware:=false
     fake_sensor_commands:=false
     arm_init_positions_file
@@ -181,6 +182,7 @@
         prefix_right="right_${robot_sn}_"
         robot_sn="${robot_sn}"
         rdk_control_mode="${rdk_control_mode}"
+        feedforward_time_constant="${feedforward_time_constant}"
         use_fake_hardware="${use_fake_hardware}"
         fake_sensor_commands="${fake_sensor_commands}"
         initial_positions_file_left="${arm_init_positions_file}"

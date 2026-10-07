@@ -13,6 +13,7 @@
     prefix_right
     robot_sn
     rdk_control_mode:='joint_position'
+    feedforward_time_constant:='0.02'
     use_fake_hardware:=false
     fake_sensor_commands:=false
     initial_positions_file_left
@@ -40,6 +41,7 @@
           <param name="prefix_left">${prefix_left}</param>
           <param name="prefix_right">${prefix_right}</param>
           <param name="rdk_control_mode">${rdk_control_mode}</param>
+          <param name="feedforward_time_constant">${feedforward_time_constant}</param>
         </xacro:unless>
       </hardware>
 
@@ -48,6 +50,7 @@
         <joint name="${arm_prefix}joint${idx}">
           <command_interface name="position" />
           <command_interface name="velocity" />
+          <command_interface name="acceleration" />
           <command_interface name="effort" />
           <state_interface name="position">
             <param name="initial_value">${initial_positions['joint' + str(idx)]}</param>
@@ -68,6 +71,7 @@
       <joint name="${robot_sn}_torso_joint1">
         <command_interface name="position" />
         <command_interface name="velocity" />
+        <command_interface name="acceleration" />
         <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${torso_initial_positions['joint1']}</param>
@@ -79,6 +83,7 @@
       <joint name="${robot_sn}_torso_joint2">
         <command_interface name="position" />
         <command_interface name="velocity" />
+        <command_interface name="acceleration" />
         <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${torso_initial_positions['joint2']}</param>
