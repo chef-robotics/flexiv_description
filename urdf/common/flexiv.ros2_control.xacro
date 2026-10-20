@@ -6,6 +6,7 @@
     prefix
     robot_sn
     rdk_control_mode:='joint_position'
+    feedforward_time_constant:='0.02'
     use_fake_hardware:=false
     fake_sensor_commands:=false
     initial_positions_file
@@ -25,12 +26,14 @@
           <param name="robot_sn">${robot_sn}</param>
           <param name="prefix">${prefix}</param>
           <param name="rdk_control_mode">${rdk_control_mode}</param>
+          <param name="feedforward_time_constant">${feedforward_time_constant}</param>
         </xacro:unless>
       </hardware>
 
       <joint name="${prefix}joint1">
         <command_interface name="position" />
         <command_interface name="velocity" />
+        <command_interface name="acceleration" />
         <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['joint1']}</param>
@@ -41,6 +44,7 @@
       <joint name="${prefix}joint2">
         <command_interface name="position" />
         <command_interface name="velocity" />
+        <command_interface name="acceleration" />
         <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['joint2']}</param>
@@ -51,6 +55,7 @@
       <joint name="${prefix}joint3">
         <command_interface name="position" />
         <command_interface name="velocity" />
+        <command_interface name="acceleration" />
         <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['joint3']}</param>
@@ -61,6 +66,7 @@
       <joint name="${prefix}joint4">
         <command_interface name="position" />
         <command_interface name="velocity" />
+        <command_interface name="acceleration" />
         <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['joint4']}</param>
@@ -71,6 +77,7 @@
       <joint name="${prefix}joint5">
         <command_interface name="position" />
         <command_interface name="velocity" />
+        <command_interface name="acceleration" />
         <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['joint5']}</param>
@@ -81,6 +88,7 @@
       <joint name="${prefix}joint6">
         <command_interface name="position" />
         <command_interface name="velocity" />
+        <command_interface name="acceleration" />
         <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['joint6']}</param>
@@ -91,6 +99,7 @@
       <joint name="${prefix}joint7">
         <command_interface name="position" />
         <command_interface name="velocity" />
+        <command_interface name="acceleration" />
         <command_interface name="effort" />
         <state_interface name="position">
           <param name="initial_value">${initial_positions['joint7']}</param>
