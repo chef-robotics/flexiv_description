@@ -17,6 +17,7 @@
     ros2_control:=false
     rdk_control_mode:='joint_position'
     feedforward_time_constant:='0.02'
+    feedforward_max_acceleration:='15.0'
     use_fake_hardware:=false
     fake_sensor_commands:=false
     add_world_link:=true
@@ -65,6 +66,7 @@
       <xacro:flexiv_ros2_control prefix="${prefix}" robot_sn="${robot_sn}"
         rdk_control_mode="${rdk_control_mode}"
         feedforward_time_constant="${feedforward_time_constant}"
+        feedforward_max_acceleration="${feedforward_max_acceleration}"
         use_fake_hardware="${use_fake_hardware}"
         fake_sensor_commands="${fake_sensor_commands}"
         initial_positions_file="${initial_positions_file}"
