@@ -40,6 +40,7 @@
   <xacro:arg name="ros2_control" default="false" />
   <xacro:arg name="rdk_control_mode" default="joint_position" />
   <xacro:arg name="feedforward_time_constant" default="0.02" />
+  <xacro:arg name="feedforward_max_acceleration" default="15.0" />
   <xacro:arg name="use_fake_hardware" default="false" />
   <xacro:arg name="fake_sensor_commands" default="false" />
   <xacro:arg name="initial_positions_file" default="" />
@@ -80,6 +81,7 @@
       ros2_control="$(arg ros2_control)"
       rdk_control_mode="$(arg rdk_control_mode)"
       feedforward_time_constant="$(arg feedforward_time_constant)"
+      feedforward_max_acceleration="$(arg feedforward_max_acceleration)"
       use_fake_hardware="$(arg use_fake_hardware)"
       fake_sensor_commands="$(arg fake_sensor_commands)"
       initial_positions_file="${resolved_initial_positions_file}"
@@ -226,6 +228,7 @@
         robot_sn="$(arg robot_sn)"
         rdk_control_mode="$(arg rdk_control_mode)"
         feedforward_time_constant="$(arg feedforward_time_constant)"
+        feedforward_max_acceleration="$(arg feedforward_max_acceleration)"
         use_fake_hardware="$(arg use_fake_hardware)"
         fake_sensor_commands="$(arg fake_sensor_commands)"
         initial_positions_file_left="${initial_positions_file_arm_1}"
@@ -245,6 +248,7 @@
       ros2_control="$(arg ros2_control)"
       rdk_control_mode="$(arg rdk_control_mode)"
       feedforward_time_constant="$(arg feedforward_time_constant)"
+      feedforward_max_acceleration="$(arg feedforward_max_acceleration)"
       use_fake_hardware="$(arg use_fake_hardware)"
       fake_sensor_commands="$(arg fake_sensor_commands)"
       arm_init_positions_file="${arm_cfg}/initial_positions.yaml"
@@ -263,6 +267,7 @@
       ros2_control="$(arg ros2_control)"
       rdk_control_mode="$(arg rdk_control_mode)"
       feedforward_time_constant="$(arg feedforward_time_constant)"
+      feedforward_max_acceleration="$(arg feedforward_max_acceleration)"
       use_fake_hardware="$(arg use_fake_hardware)"
       fake_sensor_commands="$(arg fake_sensor_commands)"
       arm_init_positions_file="${arm_cfg}/initial_positions.yaml"
@@ -281,6 +286,7 @@
       ros2_control="$(arg ros2_control)"
       rdk_control_mode="$(arg rdk_control_mode)"
       feedforward_time_constant="$(arg feedforward_time_constant)"
+      feedforward_max_acceleration="$(arg feedforward_max_acceleration)"
       use_fake_hardware="$(arg use_fake_hardware)"
       fake_sensor_commands="$(arg fake_sensor_commands)"
       arm_init_positions_file="${arm_cfg}/initial_positions.yaml"

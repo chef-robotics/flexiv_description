@@ -21,6 +21,7 @@
     ros2_control:=false
     rdk_control_mode:='joint_position'
     feedforward_time_constant:='0.02'
+    feedforward_max_acceleration:='15.0'
     use_fake_hardware:=false
     fake_sensor_commands:=false
     arm_init_positions_file
@@ -183,6 +184,7 @@
         robot_sn="${robot_sn}"
         rdk_control_mode="${rdk_control_mode}"
         feedforward_time_constant="${feedforward_time_constant}"
+        feedforward_max_acceleration="${feedforward_max_acceleration}"
         use_fake_hardware="${use_fake_hardware}"
         fake_sensor_commands="${fake_sensor_commands}"
         initial_positions_file_left="${arm_init_positions_file}"

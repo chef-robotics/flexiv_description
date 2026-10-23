@@ -7,6 +7,7 @@
     robot_sn
     rdk_control_mode:='joint_position'
     feedforward_time_constant:='0.02'
+    feedforward_max_acceleration:='15.0'
     use_fake_hardware:=false
     fake_sensor_commands:=false
     initial_positions_file
@@ -27,6 +28,7 @@
           <param name="prefix">${prefix}</param>
           <param name="rdk_control_mode">${rdk_control_mode}</param>
           <param name="feedforward_time_constant">${feedforward_time_constant}</param>
+          <param name="feedforward_max_acceleration">${feedforward_max_acceleration}</param>
         </xacro:unless>
       </hardware>
 
